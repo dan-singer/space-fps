@@ -103,6 +103,7 @@ void ASpaceFPSCharacter::BeginPlay()
 		VR_Gun->SetHiddenInGame(true, true);
 		Mesh1P->SetHiddenInGame(false, true);
 	}
+	StartLocation = GetActorLocation();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -136,6 +137,11 @@ void ASpaceFPSCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	PlayerInputComponent->BindAxis("TurnRate", this, &ASpaceFPSCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ASpaceFPSCharacter::LookUpAtRate);
+}
+
+void ASpaceFPSCharacter::ResetLocation()
+{
+	SetActorLocation(StartLocation);
 }
 
 void ASpaceFPSCharacter::OnFire()
