@@ -46,11 +46,27 @@ class ASpaceFPSCharacter : public ACharacter
 	class UMotionControllerComponent* L_MotionController;
 
 public:
+	
+	UFUNCTION(BlueprintCallable)
+	void SetJumpEnabled(bool Value);
+
+	UFUNCTION(BlueprintCallable)
+	void SetCanFire(bool Value);
+
 	ASpaceFPSCharacter();
 
 protected:
 
 	FVector StartLocation;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool CanPlayerJump = false;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool CanFire = false;
+
+	void OnJump();
+	void OnEndJump();
 
 	virtual void BeginPlay();
 

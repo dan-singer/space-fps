@@ -84,6 +84,32 @@ ASpaceFPSCharacter::ASpaceFPSCharacter()
 	//bUsingMotionControllers = true;
 }
 
+void ASpaceFPSCharacter::OnJump()
+{
+	if (!CanPlayerJump) {
+		return;
+	}
+	Jump();
+}
+
+void ASpaceFPSCharacter::OnEndJump()
+{
+	if (!CanPlayerJump) {
+		return;
+	}
+	StopJumping();
+}
+
+void ASpaceFPSCharacter::SetJumpEnabled(bool Value)
+{
+	CanPlayerJump = Value;
+}
+
+void ASpaceFPSCharacter::SetCanFire(bool Value)
+{
+	CanFire = Value;
+}
+
 void ASpaceFPSCharacter::BeginPlay()
 {
 	// Call the base class  
@@ -115,8 +141,8 @@ void ASpaceFPSCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	check(PlayerInputComponent);
 
 	// Bind jump events
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASpaceFPSCharacter::OnJump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ASpaceFPSCharacter::OnEndJump);
 
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASpaceFPSCharacter::OnFire);
@@ -146,6 +172,9 @@ void ASpaceFPSCharacter::ResetLocation()
 
 void ASpaceFPSCharacter::OnFire()
 {
+	if (!CanFire) {
+		return;
+	}
 	// try and fire a projectile
 	if (ProjectileClass != NULL)
 	{
