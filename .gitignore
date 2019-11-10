@@ -79,7 +79,13 @@ Builds/
 
 # Assets from Marketplace
 StarterContent/
-ModSci*/
 ParagonMinions/
 FPS_Weapon_Bundle/
 ProceduralNaturePack/
+
+# ModSci except for meshes which have custom LODs
+/Content/ModSci*/Blueprints/
+/Content/ModSci*/Maps/
+/Content/ModSci*/Materials/
+/Content/ModSci*/Particles/
+/Content/ModSci*/Textures/
