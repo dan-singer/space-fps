@@ -17,6 +17,12 @@ DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 //////////////////////////////////////////////////////////////////////////
 // ASpaceFPSCharacter
 
+void ASpaceFPSCharacter::CollectPickup()
+{
+	++PickupsCollected;
+	CollectedPickup.Broadcast();
+}
+
 ASpaceFPSCharacter::ASpaceFPSCharacter()
 {
 	// Set size for collision capsule

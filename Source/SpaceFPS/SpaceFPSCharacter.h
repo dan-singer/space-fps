@@ -8,10 +8,13 @@
 
 class UInputComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCollectedPickup);
+
 UCLASS(config=Game)
 class ASpaceFPSCharacter : public ACharacter
 {
 	GENERATED_BODY()
+
 
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
@@ -53,11 +56,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetCanFire(bool Value);
 
+	UFUNCTION(BlueprintCallable)
+	void CollectPickup();
+
 	ASpaceFPSCharacter();
 
 protected:
 
+	UPROPERTY(BlueprintAssignable)
+	FCollectedPickup CollectedPickup;
+
 	FVector StartLocation;
+
+	UPROPERTY(BlueprintReadWrite)
+	int PickupsCollected = 0;
+
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	bool CanPlayerJump = false;
