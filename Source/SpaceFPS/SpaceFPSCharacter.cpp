@@ -315,6 +315,7 @@ void ASpaceFPSCharacter::MoveRight(float Value)
 
 void ASpaceFPSCharacter::TurnAtRate(float Rate)
 {
+	UE_LOG(LogTemp, Warning, TEXT("%f"), BaseTurnRate);
 	// calculate delta for this frame from the rate information
 	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 }
