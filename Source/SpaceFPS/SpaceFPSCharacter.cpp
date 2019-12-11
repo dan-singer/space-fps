@@ -106,77 +106,7 @@ void ASpaceFPSCharacter::OnEndJump()
 	StopJumping();
 }
 
-void ASpaceFPSCharacter::SetJumpEnabled(bool Value)
-{
-	CanPlayerJump = Value;
-}
-
-void ASpaceFPSCharacter::SetCanFire(bool Value)
-{
-	CanFire = Value;
-}
-
-void ASpaceFPSCharacter::BeginPlay()
-{
-	// Call the base class  
-	Super::BeginPlay();
-
-	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
-	FP_Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
-
-	// Show or hide the two versions of the gun based on whether or not we're using motion controllers.
-	if (bUsingMotionControllers)
-	{
-		VR_Gun->SetHiddenInGame(false, true);
-		Mesh1P->SetHiddenInGame(true, true);
-	}
-	else
-	{
-		VR_Gun->SetHiddenInGame(true, true);
-		Mesh1P->SetHiddenInGame(false, true);
-	}
-	StartLocation = GetActorLocation();
-}
-
-//////////////////////////////////////////////////////////////////////////
-// Input
-
-void ASpaceFPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
-{
-	// set up gameplay key bindings
-	check(PlayerInputComponent);
-
-	// Bind jump events
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASpaceFPSCharacter::OnJump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ASpaceFPSCharacter::OnEndJump);
-
-	// Bind fire event
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASpaceFPSCharacter::OnFire);
-
-	// Enable touchscreen input
-	EnableTouchscreenMovement(PlayerInputComponent);
-
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ASpaceFPSCharacter::OnResetVR);
-
-	// Bind movement events
-	PlayerInputComponent->BindAxis("MoveForward", this, &ASpaceFPSCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ASpaceFPSCharacter::MoveRight);
-
-	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
-	// "turn" handles devices that provide an absolute delta, such as a mouse.
-	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
-	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("TurnRate", this, &ASpaceFPSCharacter::TurnAtRate);
-	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-	PlayerInputComponent->BindAxis("LookUpRate", this, &ASpaceFPSCharacter::LookUpAtRate);
-}
-
-void ASpaceFPSCharacter::ResetLocation()
-{
-	SetActorLocation(StartLocation);
-}
-
-void ASpaceFPSCharacter::OnFire()
+void ASpaceFPSCharacter::Fire(UClass* ProjectileClass)
 {
 	if (!CanFire) {
 		return;
@@ -224,6 +154,141 @@ void ASpaceFPSCharacter::OnFire()
 		{
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
 		}
+	}
+	LastFireTime = GetWorld()->GetTimeSeconds();
+}
+
+void ASpaceFPSCharacter::SetJumpEnabled(bool Value)
+{
+	CanPlayerJump = Value;
+}
+
+void ASpaceFPSCharacter::SetCanFire(bool Value)
+{
+	CanFire = Value;
+}
+
+void ASpaceFPSCharacter::BeginPlay()
+{
+	// Call the base class  
+	Super::BeginPlay();
+
+	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
+	FP_Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+
+	// Show or hide the two versions of the gun based on whether or not we're using motion controllers.
+	if (bUsingMotionControllers)
+	{
+		VR_Gun->SetHiddenInGame(false, true);
+		Mesh1P->SetHiddenInGame(true, true);
+	}
+	else
+	{
+		VR_Gun->SetHiddenInGame(true, true);
+		Mesh1P->SetHiddenInGame(false, true);
+	}
+	StartLocation = GetActorLocation();
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Input
+
+void ASpaceFPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+{
+	// set up gameplay key bindings
+	check(PlayerInputComponent);
+
+	// Bind jump events
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASpaceFPSCharacter::OnJump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ASpaceFPSCharacter::OnEndJump);
+
+	// Bind fire event
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASpaceFPSCharacter::OnFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ASpaceFPSCharacter::OnFireUp);
+
+	// Enable touchscreen input
+	EnableTouchscreenMovement(PlayerInputComponent);
+
+	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ASpaceFPSCharacter::OnResetVR);
+
+	// Bind movement events
+	PlayerInputComponent->BindAxis("MoveForward", this, &ASpaceFPSCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &ASpaceFPSCharacter::MoveRight);
+
+	// Bind weapon switching events
+	PlayerInputComponent->BindAction("ScrollUp", IE_Pressed, this, &ASpaceFPSCharacter::OnScrollUp);
+	PlayerInputComponent->BindAction("ScrollDown", IE_Pressed, this, &ASpaceFPSCharacter::OnScrollDown);
+
+
+	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
+	// "turn" handles devices that provide an absolute delta, such as a mouse.
+	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
+	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("TurnRate", this, &ASpaceFPSCharacter::TurnAtRate);
+	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("LookUpRate", this, &ASpaceFPSCharacter::LookUpAtRate);
+}
+
+void ASpaceFPSCharacter::ResetLocation()
+{
+	SetActorLocation(StartLocation);
+}
+
+void ASpaceFPSCharacter::GiveChargeBeam()
+{
+	CanCharge = true;
+}
+
+void ASpaceFPSCharacter::GiveNextWeapon()
+{
+	++GunsUnlocked;
+}
+
+void ASpaceFPSCharacter::OnFire()
+{
+	if (Gun == GunType::Normal) {
+		Fire(NormalProjectile);
+		if (CanCharge) {
+			Charging = true;
+		}
+	}
+	else if (Gun == GunType::Missile) {
+		Fire(MissileProjectile);
+	}
+
+}
+
+void ASpaceFPSCharacter::OnFireUp()
+{
+	if (Gun == GunType::Normal && CanCharge) {
+		float chargeDuration = GetWorld()->GetTimeSeconds() - LastFireTime;
+		if (chargeDuration >= MinChargeDuration) {
+			Fire(ChargeBeamProjectile);
+		}
+		Charging = false;
+	}
+
+}
+
+void ASpaceFPSCharacter::OnScrollUp()
+{
+	uint8 gunInt = (uint8)Gun;
+	if (gunInt < GunsUnlocked - 1) {
+		Gun = (GunType)(gunInt + 1);
+	}
+	else {
+		Gun = (GunType)0;
+	}
+}
+
+void ASpaceFPSCharacter::OnScrollDown()
+{
+	uint8 gunInt = (uint8)Gun;
+	if (gunInt > 0) {
+		Gun = (GunType)(gunInt - 1);
+	}
+	else {
+		Gun = (GunType)(GunsUnlocked - 1);
 	}
 }
 

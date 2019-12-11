@@ -8,13 +8,19 @@
 
 class UInputComponent;
 
+UENUM(BlueprintType)
+enum class GunType : uint8 {
+	Normal,
+	Missile,
+	NUM_GUNS
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCollectedPickup);
 
 UCLASS(config=Game)
 class ASpaceFPSCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
 
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
@@ -48,6 +54,8 @@ class ASpaceFPSCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UMotionControllerComponent* L_MotionController;
 
+	void Fire(UClass* ProjectileClass);
+
 public:
 	
 	UFUNCTION(BlueprintCallable)
@@ -71,12 +79,25 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	int PickupsCollected = 0;
 
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	bool CanPlayerJump = false;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	bool CanFire = false;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool Charging = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	float MinChargeDuration = 1.0f;
+
+	float LastFireTime = 0.0f;
+
+	UPROPERTY(BlueprintReadOnly)
+	GunType Gun = GunType::Normal;
+
+	int GunsUnlocked = 1;
+	bool CanCharge = false;
 
 	void OnJump();
 	void OnEndJump();
@@ -96,9 +117,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	FVector GunOffset;
 
-	/** Projectile class to spawn */
-	UPROPERTY(EditDefaultsOnly, Category=Projectile)
-	TSubclassOf<class ASpaceFPSProjectile> ProjectileClass;
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	TSubclassOf<class ASpaceFPSProjectile> NormalProjectile;
+
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	TSubclassOf<class ASpaceFPSProjectile> ChargeBeamProjectile;
+
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	TSubclassOf<class ASpaceFPSProjectile> MissileProjectile;
 
 	/** Sound to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
@@ -115,10 +141,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ResetLocation();
 
+	UFUNCTION(BlueprintCallable)
+	void GiveChargeBeam();
+
+	UFUNCTION(BlueprintCallable)
+	void GiveNextWeapon();
+
 protected:
 	
 	/** Fires a projectile. */
 	void OnFire();
+
+	void OnFireUp();
+
+	void OnScrollUp();
+	void OnScrollDown();
 
 	/** Resets HMD orientation and position in VR. */
 	void OnResetVR();
@@ -126,7 +163,7 @@ protected:
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
 
-	/** Handles stafing movement, left and right */
+	/** Handles strafing movement, left and right */
 	void MoveRight(float Val);
 
 	/**
