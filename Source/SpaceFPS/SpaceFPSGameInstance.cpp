@@ -6,7 +6,7 @@
 USpaceFPSGameInstance::USpaceFPSGameInstance() : UGameInstance()
 {
 	Rooms.Add("Mini Boss", { 5, 0 });
-	Rooms.Add("Final Boss", { 10, 0 });
+	Rooms.Add("Final Boss", { 6, 0 });
 }
 
 void USpaceFPSGameInstance::ReportEnemyKilled(FString roomName)
