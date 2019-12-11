@@ -2,6 +2,7 @@
 
 
 #include "Enemy.h"
+#include "SpaceFPSGameInstance.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -23,6 +24,8 @@ void AEnemy::OnHit(ASpaceFPSProjectile* projectile)
 	Health -= projectile->GetDamage();
 	Hit.Broadcast();
 	if (Health <= 0) {
+		USpaceFPSGameInstance* GameInstance = GetGameInstance<USpaceFPSGameInstance>();
+		GameInstance->ReportEnemyKilled(RoomName);
 		Destroy();
 	}
 }
