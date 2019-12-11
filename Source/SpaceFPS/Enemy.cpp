@@ -18,6 +18,15 @@ void AEnemy::BeginPlay()
 	
 }
 
+void AEnemy::OnHit(ASpaceFPSProjectile* projectile)
+{
+	Health -= projectile->GetDamage();
+	Hit.Broadcast();
+	if (Health <= 0) {
+		Destroy();
+	}
+}
+
 // Called every frame
 void AEnemy::Tick(float DeltaTime)
 {

@@ -41,3 +41,8 @@ void ASpaceFPSProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 		Destroy();
 	}
 }
+
+float ASpaceFPSProjectile::GetDamage()
+{
+	return Damage;
+}

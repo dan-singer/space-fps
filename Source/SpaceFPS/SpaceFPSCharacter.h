@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "SpaceFPSProjectile.h"
 #include "SpaceFPSCharacter.generated.h"
 
 class UInputComponent;
@@ -16,6 +17,9 @@ enum class GunType : uint8 {
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCollectedPickup);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHit);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDeath);
+
 
 UCLASS(config=Game)
 class ASpaceFPSCharacter : public ACharacter
@@ -74,6 +78,12 @@ protected:
 	UPROPERTY(BlueprintAssignable)
 	FCollectedPickup CollectedPickup;
 
+	UPROPERTY(BlueprintAssignable)
+	FHit Hit;
+
+	UPROPERTY(BlueprintAssignable)
+	FDeath Death;
+
 	FVector StartLocation;
 
 	UPROPERTY(BlueprintReadWrite)
@@ -99,8 +109,14 @@ protected:
 	int GunsUnlocked = 1;
 	bool CanCharge = false;
 
+	UPROPERTY(BlueprintReadWrite)
+	float Health = 100.0f;
+
 	void OnJump();
 	void OnEndJump();
+
+	UFUNCTION(BlueprintCallable)
+	void OnHit(ASpaceFPSProjectile* projectile);
 
 	virtual void BeginPlay();
 

@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "SpaceFPSProjectile.h"
 #include "Enemy.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEnemyHit);
 
 UCLASS()
 class SPACEFPS_API AEnemy : public ACharacter
@@ -18,6 +21,13 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	float Health = 100.0f;
+
+	FEnemyHit Hit;
+
+	UFUNCTION(BlueprintCallable)
+	void OnHit(ASpaceFPSProjectile* projectile);
 
 public:	
 	// Called every frame

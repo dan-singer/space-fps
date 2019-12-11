@@ -106,6 +106,16 @@ void ASpaceFPSCharacter::OnEndJump()
 	StopJumping();
 }
 
+void ASpaceFPSCharacter::OnHit(ASpaceFPSProjectile* projectile)
+{
+	Health -= projectile->GetDamage();
+	UE_LOG(LogTemp, Warning, TEXT("[Player Health] : %f"), Health);
+	Hit.Broadcast();
+	if (Health <= 0) {
+		Death.Broadcast();
+	}
+}
+
 void ASpaceFPSCharacter::Fire(UClass* ProjectileClass)
 {
 	if (!CanFire) {
