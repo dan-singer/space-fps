@@ -19,3 +19,6 @@ Various asset packs are used in this project and have been optimized.
 - [FPS Weapon Bundle](https://www.unrealengine.com/marketplace/en-US/slug/fps-weapon-bundle)
 - [Energy Rifle](https://www.turbosquid.com/3d-models/laser-rifle-energy-blend-free/699887)
 - [Missile](https://www.turbosquid.com/FullPreview/Index.cfm/ID/309350)
+
+## Testing out the project
+Getting setup with this project locally will require downloading and installing each of these asset packs. If you would just like to play this demo, see the Releases tab.
